@@ -1,7 +1,8 @@
-const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
+const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const mapAlbumDBToModel = require('../../utils/mapAlbumDBToModel');
 
 class AlbumsService {
   constructor() {
@@ -22,7 +23,7 @@ class AlbumsService {
       throw new InvariantError('Failed adding new album');
     }
 
-    return queryResult.rows[0].id;
+    return queryResult.rows[0].album_id;
   }
 
   async getAlbumById(id) {
@@ -34,7 +35,7 @@ class AlbumsService {
     const albumQueryResult = await this._pool.query(albumQuery);
 
     if (!albumQueryResult.rows.length) {
-      throw new InvariantError('Album with specified id not found');
+      throw new NotFoundError('Album with specified id not found');
     }
 
     /**
@@ -49,13 +50,14 @@ class AlbumsService {
      * to match the expected property name
      * (map 'album_id' from db to 'albumId' in response)
      */
-    return albumQueryResult.rows[0];
+    return albumQueryResult.rows.map(mapAlbumDBToModel)[0];
   }
 
   /**
    * TODO: implement editAlbumById()
    */
   async editAlbumById(id, { name, year }) {
+
     const query = {
       text: 'UPDATE albums SET name = $1, year = $2 WHERE album_id = $3 RETURNING album_id',
       values: [name, year, id],
@@ -63,7 +65,7 @@ class AlbumsService {
 
     const queryResult = await this._pool.query(query);
 
-    if (!queryResult.rows[0].album_id) {
+    if (!queryResult.rows.length) {
       throw new NotFoundError('Failed updating album. Id not found');
     }
   }
