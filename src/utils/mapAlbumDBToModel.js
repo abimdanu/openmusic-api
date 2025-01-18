@@ -1,4 +1,12 @@
-/**
- * TODO: implement a mapper util to map db column name
- * to match the expected property name
- */
+/* eslint-disable camelcase */
+const mapAlbumDBToModel = ({
+  album_id,
+  name,
+  year,
+}) => ({
+  id: album_id,
+  name,
+  year,
+});
+
+module.exports = mapAlbumDBToModel;
