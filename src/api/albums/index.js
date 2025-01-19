@@ -1,7 +1,3 @@
-/**
- * TODO: register Hapi plugins for albums
- */
-
 const AlbumsHandler = require('./handler');
 const routes = require('./routes');
 

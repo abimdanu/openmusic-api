@@ -32,9 +32,6 @@ const init = async () => {
     },
   ]);
 
-  /**
-   * TODO: apply custom error when handling responses
-   */
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
 

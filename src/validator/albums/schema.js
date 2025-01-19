@@ -1,7 +1,3 @@
-/**
- * TODO: implement Joi schema for albums
- */
-
 const Joi = require('joi');
 
 const AlbumPayloadSchema = Joi.object({

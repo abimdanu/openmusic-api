@@ -1,6 +1,3 @@
-/**
- * TODO: implement album payload validator
- */
 const InvariantError = require('../../exceptions/InvariantError');
 const { AlbumPayloadSchema } = require('./schema');
 

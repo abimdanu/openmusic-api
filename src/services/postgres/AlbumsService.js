@@ -53,9 +53,6 @@ class AlbumsService {
     return albumQueryResult.rows.map(mapAlbumDBToModel)[0];
   }
 
-  /**
-   * TODO: implement editAlbumById()
-   */
   async editAlbumById(id, { name, year }) {
 
     const query = {
@@ -70,9 +67,6 @@ class AlbumsService {
     }
   }
 
-  /**
-   * TODO: implement deleteAlbumById()
-   */
   async deleteAlbumById(id) {
     const query = {
       text: 'DELETE FROM albums WHERE album_id = $1 RETURNING album_id',
