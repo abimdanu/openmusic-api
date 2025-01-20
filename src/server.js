@@ -46,13 +46,22 @@ const init = async () => {
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
 
-    if (response instanceof ClientError) {
-      console.log(response);
+    if (response instanceof Error) {
+      if (response instanceof ClientError) {
+        return h.response({
+          status: 'fail',
+          message: response.message
+        }).code(response.statusCode);
+      }
+
+      if (!response.isServer) {
+        return h.continue;
+      }
 
       return h.response({
-        status: 'fail',
-        message: response.message,
-      }).code(response.statusCode);
+        status: 'error',
+        message: 'There was an internal server error'
+      }).code(500);
     }
 
     return h.continue;
