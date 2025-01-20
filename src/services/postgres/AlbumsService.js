@@ -43,8 +43,18 @@ class AlbumsService {
      * 1. Check for the songs in the album (query)
      * 2. Check if there are/no songs in the album (if-else)
      */
+    const songsQuery = {
+      text: 'SELECT song_id AS id, title, performer FROM songs WHERE album_id = $1',
+      values: [id],
+    };
 
-    return albumQueryResult.rows.map(mapAlbumDBToModel)[0];
+    const songsQueryResult = await this._pool.query(songsQuery);
+
+    if (!songsQueryResult.rows.length) {
+      return { ...albumQueryResult.rows.map(mapAlbumDBToModel)[0], songs: [] };
+    }
+
+    return { ...albumQueryResult.rows.map(mapAlbumDBToModel)[0], songs: songsQueryResult.rows };
   }
 
   async editAlbumById(id, { name, year }) {
