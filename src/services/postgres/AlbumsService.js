@@ -44,12 +44,6 @@ class AlbumsService {
      * 2. Check if there are/no songs in the album (if-else)
      */
 
-    /**
-     * TODO:
-     * use mapAlbumDBToModel() to map db column name
-     * to match the expected property name
-     * (map 'album_id' from db to 'albumId' in response)
-     */
     return albumQueryResult.rows.map(mapAlbumDBToModel)[0];
   }
 
