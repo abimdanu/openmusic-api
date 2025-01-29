@@ -19,7 +19,7 @@ class SongsService {
 
     const queryResult = await this._pool.query(query);
 
-    if (!queryResult.rows.length) {
+    if (!queryResult.rowCount) {
       throw new InvariantError('Failed adding new song');
     }
 
@@ -45,11 +45,11 @@ class SongsService {
 
     const queryResult = await this._pool.query(query);
 
-    if (!queryResult.rows.length) {
+    if (!queryResult.rowCount) {
       throw new NotFoundError('Song with specified id not found');
     }
 
-    return queryResult.rows.map(mapSongDBToModel)[0];
+    return mapSongDBToModel(queryResult.rows[0]);
   }
 
   async editSongById(id, { title, year, performer, genre, duration }) {
@@ -60,7 +60,7 @@ class SongsService {
 
     const queryResult = await this._pool.query(query);
 
-    if (!queryResult.rows.length) {
+    if (!queryResult.rowCount) {
       throw new NotFoundError('Failed updating song. Id not found');
     }
   }
@@ -73,7 +73,7 @@ class SongsService {
 
     const queryResult = await this._pool.query(query);
 
-    if (!queryResult.rows.length) {
+    if (!queryResult.rowCount) {
       throw new NotFoundError('Failed deleting song. Id not found');
     }
   }

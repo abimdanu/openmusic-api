@@ -2,8 +2,6 @@
  * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
  */
 
-/* eslint-disable camelcase */
-
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}
  * @param run {() => void | undefined}
@@ -11,6 +9,7 @@
  */
 exports.up = (pgm) => {
   pgm.createTable('albums', {
+    /* eslint-disable camelcase */
     album_id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
