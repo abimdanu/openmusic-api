@@ -17,10 +17,17 @@ const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
 
+// Import for authentications feature
+const authentications = require('./api/authentications');
+const AuthenticationsService = require('./services/postgres/AuthenticationsService');
+const AuthenticationsValidator = require('./validator/authentications');
+const TokenManager = require('./tokenize/TokenManager');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
   const albumsService = new AlbumsService();
+  const authenticationsService = new AuthenticationsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
 
@@ -55,6 +62,15 @@ const init = async () => {
         service: usersService,
         validator: UsersValidator,
       }
+    },
+    {
+      plugin: authentications,
+      options: {
+        authenticationsService,
+        usersService,
+        tokenManager: TokenManager,
+        validator: AuthenticationsValidator,
+      }
     }
   ]);
 
@@ -62,6 +78,8 @@ const init = async () => {
     const { response } = request;
 
     if (response instanceof Error) {
+      console.error(response);
+
       if (response instanceof ClientError) {
         return h.response({
           status: 'fail',
@@ -83,7 +101,7 @@ const init = async () => {
   });
 
   await server.start();
-  console.log(`Server running on ${server.info.uri}`);
+  console.log(`Server is running on ${server.info.uri}`);
 };
 
 init();
