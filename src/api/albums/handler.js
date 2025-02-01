@@ -20,7 +20,7 @@ class AlbumsHandler {
       message: 'Album added successfully',
       data: {
         albumId,
-      }
+      },
     }).code(201);
   }
 
@@ -32,7 +32,7 @@ class AlbumsHandler {
       status: 'success',
       data: {
         album,
-      }
+      },
     };
   }
 

@@ -38,11 +38,6 @@ class AlbumsService {
       throw new NotFoundError('Album with specified id not found');
     }
 
-    /**
-     * TODO:
-     * 1. Check for the songs in the album (query)
-     * 2. Check if there are/no songs in the album (if-else)
-     */
     const songsQuery = {
       text: 'SELECT song_id AS id, title, performer FROM songs WHERE album_id = $1',
       values: [id],

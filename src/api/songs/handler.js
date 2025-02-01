@@ -19,7 +19,7 @@ class SongsHandler {
       message: 'Song added successfully',
       data: {
         songId,
-      }
+      },
     }).code(201);
   }
 
@@ -31,7 +31,7 @@ class SongsHandler {
       status: 'success',
       data: {
         songs,
-      }
+      },
     };
   }
 
