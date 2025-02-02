@@ -163,6 +163,39 @@ class PlaylistsService {
       }
     }
   }
+
+  async addPlaylistActivity(playlistId, songId, userId, action) {
+    const activityId = `activity-${nanoid(16)}`;
+    const currentTime = new Date().toISOString();
+
+    const query = {
+      text: 'INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5, $6) RETURNING activity_id',
+      values: [activityId, playlistId, songId, userId, action, currentTime],
+    };
+
+    const queryResult = await this._pool.query(query);
+
+    if (!queryResult.rowCount) {
+      throw new InvariantError('Failed logging activity');
+    }
+  }
+
+  async getPlaylistActivities(playlistId) {
+    const query = {
+      text: `SELECT u.username, s.title, a.action, a.time
+      FROM playlist_song_activities a
+      LEFT JOIN USERS u
+      ON a.user_id = u.user_id
+      LEFT JOIN songs s
+      ON a.song_id = s.song_id
+      WHERE a.playlist_id = $1`,
+      values: [playlistId],
+    };
+
+    const queryResult = await this._pool.query(query);
+
+    return queryResult.rows;
+  }
 }
 
 module.exports = PlaylistsService;
