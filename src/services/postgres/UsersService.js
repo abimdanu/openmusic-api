@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 
 const AuthenticationError = require('../../exceptions/AuthenticationError');
 const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class UsersService {
   constructor() {
@@ -64,6 +65,21 @@ class UsersService {
     }
 
     return userId;
+  }
+
+  async getUserById(userId) {
+    const query = {
+      text: 'SELECT username, fullname FROM users WHERE user_id = $1',
+      values: [userId],
+    };
+
+    const queryResult = await this._pool.query(query);
+
+    if (!queryResult.rowCount) {
+      throw new NotFoundError('User with specified id not found');
+    }
+
+    return queryResult.rows[0];
   }
 }
 
