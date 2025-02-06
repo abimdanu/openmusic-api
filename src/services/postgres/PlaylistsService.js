@@ -23,7 +23,7 @@ class PlaylistsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new InvariantError('Failed adding new playlist');
+      throw new InvariantError('Gagal menambahkan playlist');
     }
 
     return queryResult.rows[0].playlist_id;
@@ -55,7 +55,7 @@ class PlaylistsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Failed deleting playlist (playlist not found)');
+      throw new NotFoundError('Gagal menghapus playlist. Id tidak ditemukan');
     }
   }
 
@@ -70,7 +70,7 @@ class PlaylistsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new InvariantError('Failed adding song to playlist');
+      throw new InvariantError('Gagal menambahkan lagu ke playlist');
     }
 
     return queryResult.rows[0].playlist_song_id;
@@ -89,7 +89,7 @@ class PlaylistsService {
     const playlistQueryResult = await this._pool.query(playlistQuery);
 
     if (!playlistQueryResult.rowCount) {
-      throw new NotFoundError('Failed getting songs in playlist (playlist not found)');
+      throw new NotFoundError('Gagal mendapatkan detail playlist. Playlist tidak ditemukan');
     }
 
     const songQuery = {
@@ -125,7 +125,7 @@ class PlaylistsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new InvariantError('Failed deleting song from playlist');
+      throw new InvariantError('Gagal menghapus lagu dari playlist');
     }
   }
 
@@ -138,13 +138,13 @@ class PlaylistsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Playlist with specified id not found');
+      throw new NotFoundError('Playlist tidak ditemukan');
     }
 
     const playlist = queryResult.rows[0];
 
     if (playlist.owner !== userId) {
-      throw new AuthorizationError('Only the owner can access this playlist');
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
 
@@ -176,7 +176,7 @@ class PlaylistsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new InvariantError('Failed logging activity');
+      throw new InvariantError('Gagal menambahkan aktivitas');
     }
   }
 

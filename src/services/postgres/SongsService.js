@@ -21,7 +21,7 @@ class SongsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new InvariantError('Failed adding new song');
+      throw new InvariantError('Gagal menambahkan lagu');
     }
 
     await this._cacheService.delete(`albums:${albumId}`);
@@ -48,7 +48,7 @@ class SongsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Song with specified id not found');
+      throw new NotFoundError('Lagu tidak ditemukan');
     }
 
     return mapSongDBToModel(queryResult.rows[0]);
@@ -63,7 +63,7 @@ class SongsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Failed updating song. Id not found');
+      throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
     }
 
     const albumQuery = {
@@ -92,7 +92,7 @@ class SongsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Failed deleting song. Id not found');
+      throw new NotFoundError('Gagal menghapus lagu. Id tidak ditemukan');
     }
 
     await this._cacheService.delete(`albums:${albumQueryResult.rows[0].album_id}`);

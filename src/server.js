@@ -156,14 +156,6 @@ const init = async () => {
         validator: ExportsValidator,
       }
     },
-    // {
-    //   plugin: uploads,
-    //   options: {
-    //     albumsService,
-    //     storageService,
-    //     validator: UploadsValidator,
-    //   }
-    // },
   ]);
 
   server.ext('onPreResponse', (request, h) => {

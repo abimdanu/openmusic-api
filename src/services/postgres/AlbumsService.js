@@ -21,7 +21,7 @@ class AlbumsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rows[0].album_id) {
-      throw new InvariantError('Failed adding new album');
+      throw new InvariantError('Gagal menambahkan album');
     }
 
     await this._cacheService.delete(`albums:${albumId}`);
@@ -46,7 +46,7 @@ class AlbumsService {
       const albumQueryResult = await this._pool.query(albumQuery);
 
       if (!albumQueryResult.rowCount) {
-        throw new NotFoundError('Album with specified id not found');
+        throw new NotFoundError('Album tidak ditemukan');
       }
 
       const albumData = albumQueryResult.rows.map(mapAlbumDBToModel)[0];
@@ -81,7 +81,7 @@ class AlbumsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Failed updating album. Id not found');
+      throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
     }
 
     await this._cacheService.delete(`albums:${albumId}`);
@@ -96,7 +96,7 @@ class AlbumsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Failed deleting album. Id not found');
+      throw new NotFoundError('Gagal menghapus album. Id tidak ditemukan');
     }
 
     await this._cacheService.delete(`albums:${albumId}`);
@@ -111,7 +111,7 @@ class AlbumsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new NotFoundError('Failed updating album cover. Id not found');
+      throw new NotFoundError('Gagal memperbarui cover album. Album tidak ditemukan');
     }
 
     await this._cacheService.delete(`albums:${albumId}`);
@@ -126,7 +126,7 @@ class AlbumsService {
     const queryResult = await this._pool.query(query);
 
     if (queryResult.rowCount) {
-      throw new InvariantError('Album already liked');
+      throw new InvariantError('Album sudah di-like');
     };
   }
 
@@ -139,7 +139,7 @@ class AlbumsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new InvariantError('Failed adding like to album');
+      throw new InvariantError('Gagal menambahkan like ke album');
     }
 
     await this._cacheService.delete(`albums:${albumId}`);
@@ -180,7 +180,7 @@ class AlbumsService {
     const queryResult = await this._pool.query(query);
 
     if (!queryResult.rowCount) {
-      throw new InvariantError('Failed deleting like from album');
+      throw new InvariantError('Gagal menghapus like album. Album tidak ditemukan');
     }
 
     await this._cacheService.delete(`albums:${albumId}`);

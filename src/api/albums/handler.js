@@ -23,7 +23,7 @@ class AlbumsHandler {
 
     return h.response({
       status: 'success',
-      message: 'Album added successfully',
+      message: 'Album berhasil ditambahkan',
       data: {
         albumId,
       },
@@ -57,7 +57,7 @@ class AlbumsHandler {
 
     return {
       status: 'success',
-      message: 'Album updated successfully',
+      message: 'Album berhasil diperbarui',
     };
   }
 
@@ -68,7 +68,7 @@ class AlbumsHandler {
 
     return {
       status: 'success',
-      message: 'Album deleted successfully',
+      message: 'Album berhasil dihapus',
     };
   }
 
@@ -101,7 +101,7 @@ class AlbumsHandler {
 
     return h.response({
       status: 'success',
-      message: 'Album liked successfully',
+      message: 'Berhasil menambahkan suka album',
     }).code(201);
   }
 
@@ -115,7 +115,7 @@ class AlbumsHandler {
 
     return {
       status: 'success',
-      message: 'Album unliked successfully',
+      message: 'Berhasil membuang suka album',
     };
   }
 

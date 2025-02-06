@@ -23,7 +23,7 @@ class CacheService {
     const result = await this._client.get(key);
 
     if (!result) {
-      throw new Error('Could not find the cached key');
+      throw new Error('Nilai tidak ditemukan pada cache');
     }
 
     return result;

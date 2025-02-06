@@ -59,7 +59,7 @@ class AuthenticationsHandler {
 
     return {
       status: 'success',
-      message: 'Refresh token has been revoked',
+      message: 'Refresh token berhasil dihapus',
     };
   }
 }

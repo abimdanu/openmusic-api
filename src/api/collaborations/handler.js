@@ -46,7 +46,7 @@ class CollaborationsHandler {
 
     return {
       status: 'success',
-      message: 'Collaboration deleted successfully',
+      message: 'Kolaborasi berhasil dihapus',
     };
   }
 }

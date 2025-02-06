@@ -54,7 +54,7 @@ class PlaylistsHandler {
 
     return {
       status: 'success',
-      message: 'Playlist deleted successfully',
+      message: 'Playlist berhasil dihapus',
     };
   }
 
@@ -72,7 +72,7 @@ class PlaylistsHandler {
 
     return h.response({
       status: 'success',
-      message: 'Song added to playlist successfully',
+      message: 'Berhasil menambahkan lagu ke playlist',
     }).code(201);
   }
 
@@ -105,7 +105,7 @@ class PlaylistsHandler {
 
     return {
       status: 'success',
-      message: 'Song deleted from playlist successfully',
+      message: 'Berhasil menghapus lagu dari playlist',
     };
   }
 
