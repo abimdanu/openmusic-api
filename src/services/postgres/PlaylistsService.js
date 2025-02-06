@@ -184,7 +184,7 @@ class PlaylistsService {
     const query = {
       text: `SELECT u.username, s.title, a.action, a.time
       FROM playlist_song_activities a
-      LEFT JOIN USERS u
+      LEFT JOIN users u
       ON a.user_id = u.user_id
       LEFT JOIN songs s
       ON a.song_id = s.song_id
