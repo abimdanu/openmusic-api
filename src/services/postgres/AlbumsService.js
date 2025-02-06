@@ -90,6 +90,57 @@ class AlbumsService {
       throw new NotFoundError('Failed updating album cover. Id not found');
     }
   }
+
+  async checkAlbumLike(albumId, userId) {
+    const query = {
+      text: 'SELECT * FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
+      values: [userId, albumId],
+    };
+
+    const queryResult = await this._pool.query(query);
+
+    if (queryResult.rowCount) {
+      throw new InvariantError('Album already liked');
+    };
+  }
+
+  async likeAlbum(albumId, userId) {
+    const query = {
+      text: 'INSERT INTO user_album_likes (user_id, album_id) VALUES ($1, $2) RETURNING album_like_id',
+      values: [userId, albumId],
+    };
+
+    const queryResult = await this._pool.query(query);
+
+    if (!queryResult.rowCount) {
+      throw new InvariantError('Failed adding like to album');
+    }
+  }
+
+  async getAlbumLikes(albumId) {
+    const query = {
+      text: 'SELECT * FROM user_album_likes WHERE album_id = $1',
+      values: [albumId],
+    };
+
+    const queryResult = await this._pool.query(query);
+    const likes = queryResult.rowCount;
+
+    return likes;
+  }
+
+  async unlikeAlbum(albumId, userId) {
+    const query = {
+      text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING album_like_id',
+      values: [userId, albumId],
+    };
+
+    const queryResult = await this._pool.query(query);
+
+    if (!queryResult.rowCount) {
+      throw new InvariantError('Failed deleting like from album');
+    }
+  }
 }
 
 module.exports = AlbumsService;
