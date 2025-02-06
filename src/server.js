@@ -2,11 +2,17 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
+const path = require('path');
 
 // Import for albums feature
 const albums = require('./api/albums');
 const AlbumsService = require('./services/postgres/AlbumsService');
 const AlbumsValidator = require('./validator/albums');
+
+// Import for album cover feature
+const StorageService = require('./services/storage/StorageService');
+const UploadsValidator = require('./validator/uploads');
 
 // Import for songs feature
 const songs = require('./api/songs');
@@ -47,11 +53,15 @@ const init = async () => {
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
   const songsService = new SongsService();
+  const storageService = new StorageService(path.resolve(__dirname, './api/albums/file/images'));
   const usersService = new UsersService();
 
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
+    debug: {
+      request:['error'],
+    },
     routes: {
       cors: {
         origin: ['*'],
@@ -62,7 +72,10 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
-    }
+    },
+    {
+      plugin: Inert,
+    },
   ]);
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
@@ -85,8 +98,10 @@ const init = async () => {
     {
       plugin: albums,
       options: {
-        service: albumsService,
-        validator: AlbumsValidator,
+        albumsService,
+        storageService,
+        albumsValidator: AlbumsValidator,
+        uploadsValidator: UploadsValidator,
       }
     },
     {
@@ -136,7 +151,15 @@ const init = async () => {
         producerService: ProducerService,
         validator: ExportsValidator,
       }
-    }
+    },
+    // {
+    //   plugin: uploads,
+    //   options: {
+    //     albumsService,
+    //     storageService,
+    //     validator: UploadsValidator,
+    //   }
+    // },
   ]);
 
   server.ext('onPreResponse', (request, h) => {

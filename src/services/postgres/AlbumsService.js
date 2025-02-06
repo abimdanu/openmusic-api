@@ -53,7 +53,6 @@ class AlbumsService {
   }
 
   async editAlbumById(id, { name, year }) {
-
     const query = {
       text: 'UPDATE albums SET name = $1, year = $2 WHERE album_id = $3 RETURNING album_id',
       values: [name, year, id],
@@ -76,6 +75,19 @@ class AlbumsService {
 
     if (!queryResult.rowCount) {
       throw new NotFoundError('Failed deleting album. Id not found');
+    }
+  }
+
+  async editAlbumCover(id, fileUrl) {
+    const query = {
+      text: 'UPDATE albums SET cover_url = $1 WHERE album_id = $2 RETURNING album_id',
+      values: [fileUrl, id],
+    };
+
+    const queryResult = await this._pool.query(query);
+
+    if (!queryResult.rowCount) {
+      throw new NotFoundError('Failed updating album cover. Id not found');
     }
   }
 }
