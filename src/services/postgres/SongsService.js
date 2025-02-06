@@ -5,16 +5,17 @@ const mapSongDBToModel = require('../../utils/mapSongDBToModel');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
 class SongsService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = new Pool();
+    this._cacheService = cacheService;
   }
 
   async addSong({ title, year, performer, genre, duration, albumId }) {
-    const id = `song-${nanoid(16)}`;
+    const songId = `song-${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING song_id',
-      values: [id, title, year, performer, genre, duration, albumId],
+      values: [songId, title, year, performer, genre, duration, albumId],
     };
 
     const queryResult = await this._pool.query(query);
@@ -23,6 +24,7 @@ class SongsService {
       throw new InvariantError('Failed adding new song');
     }
 
+    await this._cacheService.delete(`albums:${albumId}`);
     return queryResult.rows[0].song_id;
   }
 
@@ -37,10 +39,10 @@ class SongsService {
     return queryResult.rows;
   }
 
-  async getSongById(id) {
+  async getSongById(songId) {
     const query = {
       text: 'SELECT * FROM songs WHERE song_id = $1',
-      values: [id],
+      values: [songId],
     };
 
     const queryResult = await this._pool.query(query);
@@ -52,10 +54,10 @@ class SongsService {
     return mapSongDBToModel(queryResult.rows[0]);
   }
 
-  async editSongById(id, { title, year, performer, genre, duration }) {
+  async editSongById(songId, { title, year, performer, genre, duration }) {
     const query = {
       text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5 WHERE song_id = $6 RETURNING song_id',
-      values: [title, year, performer, genre, duration, id],
+      values: [title, year, performer, genre, duration, songId],
     };
 
     const queryResult = await this._pool.query(query);
@@ -63,12 +65,28 @@ class SongsService {
     if (!queryResult.rowCount) {
       throw new NotFoundError('Failed updating song. Id not found');
     }
+
+    const albumQuery = {
+      text: 'SELECT album_id FROM songs WHERE song_id = $1',
+      values: [songId],
+    };
+
+    const albumQueryResult = await this._pool.query(albumQuery);
+
+    await this._cacheService.delete(`albums:${albumQueryResult.rows[0].album_id}`);
   }
 
-  async deleteSongById(id) {
+  async deleteSongById(songId) {
+    const albumQuery = {
+      text: 'SELECT album_id FROM songs WHERE song_id = $1',
+      values: [songId],
+    };
+
+    const albumQueryResult = await this._pool.query(albumQuery);
+
     const query = {
       text: 'DELETE FROM songs WHERE song_id = $1 RETURNING song_id',
-      values: [id],
+      values: [songId],
     };
 
     const queryResult = await this._pool.query(query);
@@ -76,6 +94,8 @@ class SongsService {
     if (!queryResult.rowCount) {
       throw new NotFoundError('Failed deleting song. Id not found');
     }
+
+    await this._cacheService.delete(`albums:${albumQueryResult.rows[0].album_id}`);
   }
 }
 

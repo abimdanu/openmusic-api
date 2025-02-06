@@ -56,7 +56,7 @@ const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
-  const songsService = new SongsService();
+  const songsService = new SongsService(cacheService);
   const storageService = new StorageService(path.resolve(__dirname, './api/albums/file/images'));
   const usersService = new UsersService();
 

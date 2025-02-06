@@ -11,11 +11,11 @@ class AlbumsService {
   }
 
   async addAlbum({ name, year }) {
-    const id = `album-${nanoid(16)}`;
+    const albumId = `album-${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO albums VALUES ($1, $2, $3) RETURNING album_id',
-      values: [id, name, year],
+      values: [albumId, name, year],
     };
 
     const queryResult = await this._pool.query(query);
@@ -24,39 +24,58 @@ class AlbumsService {
       throw new InvariantError('Failed adding new album');
     }
 
+    await this._cacheService.delete(`albums:${albumId}`);
+
     return queryResult.rows[0].album_id;
   }
 
-  async getAlbumById(id) {
-    const albumQuery = {
-      text: 'SELECT * FROM albums WHERE album_id = $1',
-      values: [id],
-    };
+  async getAlbumById(albumId) {
+    try {
+      const cacheResult = await this._cacheService.get(`albums:${albumId}`);
 
-    const albumQueryResult = await this._pool.query(albumQuery);
+      return {
+        album: JSON.parse(cacheResult),
+        source: 'cache'
+      };
+    } catch {
+      const albumQuery = {
+        text: 'SELECT * FROM albums WHERE album_id = $1',
+        values: [albumId],
+      };
 
-    if (!albumQueryResult.rowCount) {
-      throw new NotFoundError('Album with specified id not found');
+      const albumQueryResult = await this._pool.query(albumQuery);
+
+      if (!albumQueryResult.rowCount) {
+        throw new NotFoundError('Album with specified id not found');
+      }
+
+      const albumData = albumQueryResult.rows.map(mapAlbumDBToModel)[0];
+
+      const songsQuery = {
+        text: 'SELECT song_id AS id, title, performer FROM songs WHERE album_id = $1',
+        values: [albumId],
+      };
+
+      const songsQueryResult = await this._pool.query(songsQuery);
+
+      const album = {
+        ...albumData,
+        songs: songsQueryResult.rowCount > 0 ? songsQueryResult.rows : [],
+      };
+
+      await this._cacheService.set(`albums:${albumId}`, JSON.stringify(album));
+
+      return {
+        album,
+        source: 'database',
+      };
     }
-
-    const songsQuery = {
-      text: 'SELECT song_id AS id, title, performer FROM songs WHERE album_id = $1',
-      values: [id],
-    };
-
-    const songsQueryResult = await this._pool.query(songsQuery);
-
-    if (!songsQueryResult.rowCount) {
-      return { ...albumQueryResult.rows.map(mapAlbumDBToModel)[0], songs: [] };
-    }
-
-    return { ...albumQueryResult.rows.map(mapAlbumDBToModel)[0], songs: songsQueryResult.rows };
   }
 
-  async editAlbumById(id, { name, year }) {
+  async editAlbumById(albumId, { name, year }) {
     const query = {
       text: 'UPDATE albums SET name = $1, year = $2 WHERE album_id = $3 RETURNING album_id',
-      values: [name, year, id],
+      values: [name, year, albumId],
     };
 
     const queryResult = await this._pool.query(query);
@@ -64,12 +83,14 @@ class AlbumsService {
     if (!queryResult.rowCount) {
       throw new NotFoundError('Failed updating album. Id not found');
     }
+
+    await this._cacheService.delete(`albums:${albumId}`);
   }
 
-  async deleteAlbumById(id) {
+  async deleteAlbumById(albumId) {
     const query = {
       text: 'DELETE FROM albums WHERE album_id = $1 RETURNING album_id',
-      values: [id],
+      values: [albumId],
     };
 
     const queryResult = await this._pool.query(query);
@@ -77,12 +98,14 @@ class AlbumsService {
     if (!queryResult.rowCount) {
       throw new NotFoundError('Failed deleting album. Id not found');
     }
+
+    await this._cacheService.delete(`albums:${albumId}`);
   }
 
-  async editAlbumCover(id, fileUrl) {
+  async editAlbumCover(albumId, fileUrl) {
     const query = {
       text: 'UPDATE albums SET cover_url = $1 WHERE album_id = $2 RETURNING album_id',
-      values: [fileUrl, id],
+      values: [fileUrl, albumId],
     };
 
     const queryResult = await this._pool.query(query);
@@ -90,6 +113,8 @@ class AlbumsService {
     if (!queryResult.rowCount) {
       throw new NotFoundError('Failed updating album cover. Id not found');
     }
+
+    await this._cacheService.delete(`albums:${albumId}`);
   }
 
   async checkAlbumLike(albumId, userId) {

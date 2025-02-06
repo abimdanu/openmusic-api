@@ -30,16 +30,21 @@ class AlbumsHandler {
     }).code(201);
   }
 
-  async getAlbumByIdHandler(request) {
-    const { id } = request.params;
-    const album = await this._albumsService.getAlbumById(id);
+  async getAlbumByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+      const albumData = await this._albumsService.getAlbumById(id);
+      const { album, source } = albumData;
 
-    return {
-      status: 'success',
-      data: {
-        album,
-      },
-    };
+      return h.response({
+        status: 'success',
+        data: {
+          album,
+        },
+      }).code(200).header('X-Data-Source', source);
+    } catch (error) {
+      return error;
+    }
   }
 
   async putAlbumByIdHandler(request) {
